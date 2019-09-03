@@ -4,7 +4,7 @@ import Gameplay from './scenes/Gameplay';
 const config = {
   type: Phaser.AUTO,
   parent: "phaser-example",
-  width: 800,
+  width: 400,
   height: 600,
   scene: [
     Gameplay

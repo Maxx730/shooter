@@ -5,24 +5,18 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     constructor(scene,x,y,config) {
         super(scene,x,y,config.key);
 
-        this.SPEED = 300;
-
+		this.SPEED = 300;
+		this.lastTime = new Date();
+		this._config = config;
+		this._scene = scene;
+		this.HEALTH = 100;
         scene.physics.world.enable(this);
         scene.add.existing(this);
-        this.exhaust = scene.add.sprite(x,y,'Exhaust');
-
-        let ExhaustAnimation = {
-            key: 'idle',
-            frames: scene.anims.generateFrameNumbers('Exhaust'),
-            frameRate: 6,
-            repeat: -1,
-            yoyo: true
-        }
 
         this.setOrigin(0);
         this.setDragX(350);
         this.setImmovable(true);
-        
+		this.setSize(15,35);
 
         this.keys = scene.input.keyboard.addKeys({
 			up:Phaser.Input.Keyboard.KeyCodes.W,
@@ -33,7 +27,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         });
         
         this.keys.left.on('down',function() {
-            this.setVelocityX(-this.SPEED);
+			this.setVelocityX(-this.SPEED);
         },this);
 
         this.keys.right.on('down',function() {
@@ -49,29 +43,34 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
             this.setFrame(0);
             this.flipX = false;
         },this);
-
-        this.keys.space.on('down',function() {
-            config.shots.add(new LaserSmall(scene,this.x,this.y + 32,{
-                key: 'LaserSmall'
-            }));
-
-            config.shots.add(new LaserSmall(scene,this.x + 64,this.y + 32,{
-                key: 'LaserSmall'
-            }));
-        },this);
-
-        scene.anims.create(ExhaustAnimation);
-        this.exhaust.anims.load('idle');
-        this.exhaust.anims.play('idle');
     }
 
     preUpdate() {
-        this.exhaust.x = this.x + 32;
-        this.exhaust.y = this.y + 64;
+		
+		if(this.keys.space.isDown) {
+			if(new Date() - this.lastTime > 250) {
+				this._config.shots.add(new LaserSmall(this._scene,this.x + 18,this.y + 32,{
+					key: 'LaserSmall',
+					velY: -7,
+					startRotation: -0.15,
+					endRotation: 0,
+					distance: 0
+				}));
+	
+				this._config.shots.add(new LaserSmall(this._scene,this.x + 42,this.y + 32,{
+					key: 'LaserSmall',
+					velX: 100,
+					velY: -7,
+					startRotation: 0.15,
+					endRotation: 0,
+					distance: 0
+				}));
+				this.lastTime = new Date();
+			}
+		}
 
         if(this.keys.right.isDown) {
             this.setFrame(1)
-            this.exhaust.x = this.x + 36;
             this.flipX = true;
             this.setVelocityX(this.SPEED);
         }
@@ -79,7 +78,6 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         if(this.keys.left.isDown) {
             this.setFrame(1);
             this.flipX = false;
-            this.exhaust.x = this.x + 28;
             this.setVelocityX(-this.SPEED);
         }
     }

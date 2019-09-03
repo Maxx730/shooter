@@ -6,18 +6,34 @@ export default class LaserSmall extends Phaser.Physics.Arcade.Sprite {
 
         scene.physics.world.enable(this);
         scene.add.existing(this);
-        this._scene = scene;
+		this._scene = scene;
+		this._config = config;
 
         this.SPEED = -700;
-        this.setVelocityY(this.SPEED);
+        this.setVelocity(config.velX,config.velY)
         this.explosions = [
             'RoundExp',
             'VortexExp'
-        ]
+		];
+
+		this.rotation = this._config.startRotation
+		
+		scene.tweens.add({
+			targets: this,
+			props: {
+				x: {
+					value: this.x + this._config.distance
+				},
+				rotation: {
+					value: this._config.endRotation
+				}
+			},
+			duration: 500
+		})
     }
 
     preUpdate() {
-        this.setVelocityY(this.SPEED);
+		this.y += this._config.velY
     }
 
     getExp() {

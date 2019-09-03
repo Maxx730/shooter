@@ -3,12 +3,11 @@ export default class Asteroid extends Phaser.Physics.Arcade.Sprite {
         super(scene,x,y,config.key);
 
         this.config = config;
-
+		this.HEALTH = 50;
         scene.physics.world.enable(this);
         scene.add.existing(this);
         this.setBounce(this.getBounce(),this.getBounce())
         this.setSize(10,10);
-        
         this.angularVelocity = Math.random() * 100;
         this.velocityX = (Math.random() * 100) - 50;
         this.velocityY = Math.random() * 100;
