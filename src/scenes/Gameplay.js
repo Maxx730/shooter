@@ -13,6 +13,9 @@ import Asteroid2Img from '../assets/asteroid-2.png';
 import Asteroid3Img from '../assets/asteroid-3.png';
 import Asteroid4Img from '../assets/asteroid-4.png';
 import Asteroid from '../objects/Asteroid';
+
+
+
 import Exsplotion from '../objects/Explosion';
 import Explosion from '../objects/Explosion';
 import BackgroundAsteroid from '../objects/BackgroundAsteroid';
@@ -23,6 +26,7 @@ import EnergyImg from '../assets/Powerup_Energy.png';
 import HealthImg from '../assets/Powerup_Health.png';
 import RocketsImg from '../assets/Powerup_Rockets.png';
 import ShieldsImg from '../assets/Powerup_Shields.png';
+import Upgrade from '../objects/Upgrade';
 
 export default class Gameplay extends Phaser.Scene {
     constructor() {
@@ -42,6 +46,7 @@ export default class Gameplay extends Phaser.Scene {
         this.load.spritesheet('Asteroid2',Asteroid2Img,{frameWidth: 39,frameHeight: 39});
         this.load.spritesheet('Asteroid3',Asteroid3Img,{frameWidth: 39,frameHeight: 39});
         this.load.spritesheet('Asteroid4',Asteroid4Img,{frameWidth: 39,frameHeight: 39});
+        this.load.spritesheet('PowerupAmmo',AmmoImg,{frameWidth: 48,frameHeight: 48});
     }
 
     create() {
@@ -59,6 +64,9 @@ export default class Gameplay extends Phaser.Scene {
         this.shots = this.physics.add.group({
 
         });
+        this.powerups = this.physics.add.group({
+
+        });
 
         this.Player = new Player(this,10,600 - 84,{
             key: 'Player',
@@ -71,13 +79,13 @@ export default class Gameplay extends Phaser.Scene {
             _self.asteroids.add(new Asteroid(_self,Math.random() * 400,Math.random() * -100,{
                 key: _self.asteroidImg[Math.floor(Math.random() * _self.asteroidImg.length)]
 			}));
-         },100)
+         },500)
 
         this.physics.add.collider(this.shots,this.asteroids,null,function(shot,asteroid) {
 			shot.destroy();
 			
 			if(asteroid.HEALTH > 0) {
-				asteroid.HEALTH -= 20;
+				asteroid.HEALTH += shot.power;
 				new Explosion(this,shot.x,shot.y,{
 					key: 'RoundExpSmall'
 				})
@@ -86,7 +94,10 @@ export default class Gameplay extends Phaser.Scene {
 				this.SCORE += 50;
 				new Explosion(this,asteroid.x,asteroid.y,{
 					key: 'RoundExp'
-				})
+                });
+                this.powerups.add(new Upgrade(this,asteroid.x,asteroid.y,{
+                    key: 'PowerupAmmo'
+                }));
 			}
 
         },this);
@@ -97,7 +108,14 @@ export default class Gameplay extends Phaser.Scene {
             new Explosion(_self,asteroid1.x,asteroid1.y,{
                 key: 'VortexExp'
             })
-        })
+        });
+
+        this.physics.add.collider(this.Player,this.powerups,null,function(player,powerup) {
+            powerup.destroy();
+            if(player.guns < 5) {
+                player.guns += 1
+            }
+        });
 
         this.physics.add.collider(this.Player,this.asteroids,null,function(player,asteroid) {
 			if(_self.Player.HEALTH > 0) {
@@ -108,8 +126,7 @@ export default class Gameplay extends Phaser.Scene {
             new Explosion(_self,(asteroid.x + 32),asteroid.y,{
                 key: 'RoundExpSmall'
             })
-        })
-
+        });
 
 		this.scoreText = this.add.text(12,12,'SCORE: ' + this.SCORE).setDepth(10);
 		this.healthText = this.add.text(12,30,'HEALTH: ' + this.Player.HEALTH).setDepth(10);

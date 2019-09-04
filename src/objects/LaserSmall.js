@@ -8,7 +8,7 @@ export default class LaserSmall extends Phaser.Physics.Arcade.Sprite {
         scene.add.existing(this);
 		this._scene = scene;
 		this._config = config;
-
+		this.power = -20;
         this.SPEED = -700;
         this.setVelocity(config.velX,config.velY)
         this.explosions = [

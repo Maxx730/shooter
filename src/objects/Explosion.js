@@ -13,5 +13,8 @@ export default class Explosion extends Phaser.Physics.Arcade.Sprite {
         scene.anims.create(ExplosionAnimation);
         this.anims.load('explode_'+config.key);
         this.anims.play('explode_'+config.key);
+        this.on('animationcomplete',function() {
+            this.destroy();
+        },this); 
     }
 }

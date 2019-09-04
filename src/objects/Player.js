@@ -5,8 +5,9 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     constructor(scene,x,y,config) {
         super(scene,x,y,config.key);
 
-		this.SPEED = 300;
-		this.lastTime = new Date();
+		this.SPEED = 200;
+        this.lastTime = new Date();
+        this.guns = 3;
 		this._config = config;
 		this._scene = scene;
 		this.HEALTH = 100;
@@ -49,22 +50,18 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
 		
 		if(this.keys.space.isDown) {
 			if(new Date() - this.lastTime > 250) {
-				this._config.shots.add(new LaserSmall(this._scene,this.x + 18,this.y + 32,{
-					key: 'LaserSmall',
-					velY: -7,
-					startRotation: -0.15,
-					endRotation: 0,
-					distance: 0
-				}));
-	
-				this._config.shots.add(new LaserSmall(this._scene,this.x + 42,this.y + 32,{
-					key: 'LaserSmall',
-					velX: 100,
-					velY: -7,
-					startRotation: 0.15,
-					endRotation: 0,
-					distance: 0
-				}));
+                let amount = 64 / this.guns;
+
+                for(let i = 0;i < this.guns;i++) {
+                    this._config.shots.add(new LaserSmall(this._scene,this.x + (amount * (i + 1)),(i === 2) ? this.y : this.y + 32,{
+                        key: 'LaserSmall',
+                        velY: -7,
+                        startRotation: -0.15,
+                        endRotation: 0,
+                        distance: 0
+                    }));
+                }
+
 				this.lastTime = new Date();
 			}
 		}
